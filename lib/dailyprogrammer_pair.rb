@@ -4,23 +4,7 @@ require 'uri'
 require 'net/http'
 
 require_relative 'resources/client'
-
-class Redis
-  def recent_at_messages
-    self.select("0")
-    self
-  end
-
-  def pair_requests
-    self.select("1")
-    self
-  end
-
-  def not_seen?(tweet)
-    self.select("0")
-    !!!self.get(tweet.id)
-  end
-end
+require_relative 'dailyprogrammer_pair/redis'
 
 
 class Twitter::Tweet
@@ -68,10 +52,16 @@ end
 
 
 class Job
-  def initialize
+  attr_reader :redis
+
+  def initialize redis_configuration
+    @redis = DailyprogrammerPair::Redis.new(Redis.new(redis_configuration))
+  end
+
+  def call
     puts "Initialized job..."
     CLIENT.search("to:tw_gem_test", result_type: "recent").take(10).each do |tweet|
-      TweetHandler.new(tweet) if Redis.new.not_seen?(tweet)
+      TweetHandler.new(tweet) if redis.not_seen?(tweet)
     end
   end
 end
@@ -109,7 +99,9 @@ class TweetHandler
 end
 
 
+redis_configuration = {}
+
 while true do
-  Job.new
+  Job.new(redis_configuration).call
   sleep 5
 end
