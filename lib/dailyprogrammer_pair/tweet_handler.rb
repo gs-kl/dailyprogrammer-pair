@@ -16,7 +16,7 @@ module DailyprogrammerPair
         puts "Tweet #{tweet} (\"#{tweet.text}\") was not a valid pair request; sending repsonse..."
         twitter_client.update("@#{tweet.user.screen_name} I only understand (correctly formatted) pair requests. Check your syntax or tweet @litchk.", in_reply_to_status_id: tweet.id)
       end
-      redis_client.recent_at_messages.set(tweet.id, true)
+      redis_client.remember(tweet)
     end
   end
 end

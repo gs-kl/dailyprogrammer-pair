@@ -6,19 +6,12 @@ module DailyprogrammerPair
       @redis_object = redis_object
     end
 
-    def recent_at_messages
-      redis_object.select("0")
-      redis_object
-    end
-
-    def pair_requests
-      redis_object.select("1")
-      redis_object
-    end
-
     def not_seen?(tweet)
-      redis_object.select("0")
-      !!!redis_object.get(tweet.id)
+      !!!recent_at_messages.get(tweet.id)
+    end
+
+    def remember(tweet)
+      recent_at_messages.set(tweet.id, true)
     end
 
     def set_new_pair_request_for(tweet)
@@ -34,5 +27,18 @@ module DailyprogrammerPair
     def delete_match_for(tweet)
       pair_requests.del(tweet.params.expanded_url)
     end
+
+    private
+
+    def recent_at_messages
+      redis_object.select("0")
+      redis_object
+    end
+
+    def pair_requests
+      redis_object.select("1")
+      redis_object
+    end
+
   end
 end
