@@ -1,3 +1,5 @@
+require 'tweet_handler'
+
 module DailyprogrammerPair
   class Job
     attr_reader :redis_client, :twitter_client
@@ -10,7 +12,7 @@ module DailyprogrammerPair
     def call
       puts "Initialized job..."
       latest_tweets.each do |tweet|
-        TweetHandler.new(tweet) if redis_client.not_seen?(tweet)
+        TweetHandler.new(redis_client, twitter_client).call(tweet) if redis_client.not_seen?(tweet)
       end
     end
 
