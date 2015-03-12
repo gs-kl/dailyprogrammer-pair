@@ -1,4 +1,4 @@
-require 'tweet_handler'
+require_relative 'tweet_handler'
 
 module DailyprogrammerPair
   class Job

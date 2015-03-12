@@ -13,7 +13,7 @@ module DailyprogrammerPair
     end
 
     def update *args
-      client.update args
+      client.send(:update, *args)
     end
   end
 end

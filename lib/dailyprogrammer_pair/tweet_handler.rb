@@ -10,10 +10,11 @@ module DailyprogrammerPair
     def call(tweet)
       puts "Handling tweet #{tweet.id}..."
       if tweet.is_pair_request?
-        RequestHandler.new(tweet)
+        puts "Sending tweet to RequestHandler..."
+        RequestHandler.new(redis_client, twitter_client).call(tweet)
       else
-        twitter_client.update("@#{tweet.user.username} I only understand correctly formatted pair requests, and that wasn't one. Check your syntax or tweet at litchk.", in_reply_to_status_id: tweet.id)
-        puts "Tweet #{tweet} was not a valid pair request!\n#{tweet.text}"
+        puts "Tweet #{tweet} (\"#{tweet.text}\") was not a valid pair request; sending repsonse..."
+        twitter_client.update("@#{tweet.user.screen_name} I only understand (correctly formatted) pair requests. Check your syntax or tweet @litchk.", in_reply_to_status_id: tweet.id)
       end
       redis_client.recent_at_messages.set(tweet.id, true)
     end

@@ -3,51 +3,14 @@ require 'redis'
 require 'uri'
 require 'net/http'
 
-require_relative 'resources/client'
+require_relative '../resources/client'
 require_relative 'dailyprogrammer_pair/redis'
 require_relative 'dailyprogrammer_pair/job'
-
-
-
-
-class TweetParams
-  attr_reader :tweet
-
-  def initialize tweet
-    @tweet = tweet
-  end
-
-  def has_shortened_url?
-    @tweet.text.match(/http:\/\/t.co\/\S*/)
-  end
-
-  def shortened_url
-    @tweet.text.match(/http:\/\/t.co\/\S*/)[0]
-  end
-
-  def expanded_url
-    uri = URI(shortened_url)
-    Net::HTTP.new(uri.host, uri.port).get(uri.path).header["location"]
-  end
-end
-
-class RequestHandler
-  attr_reader :tweet
-
-  def initialize(tweet)
-    @tweet = tweet
-    pair_them if matching_request_exists?
-  end
-
-  def matching_request_exists?
-  end
-
-#     puts ".@#{tweet.user.screen_name} is looking for a pair for #{tweet.params.shortened_url}"
-#     Redis.new.create_new_pair_request_for(tweet)
-#     puts tweet.text
-  #
-end
-
+require_relative 'dailyprogrammer_pair/twitter_client'
+require_relative 'dailyprogrammer_pair/tweet_handler'
+require_relative 'dailyprogrammer_pair/tweet'
+require_relative 'dailyprogrammer_pair/tweet_params'
+require_relative 'dailyprogrammer_pair/request_handler'
 
 
 redis_configuration = {}

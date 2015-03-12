@@ -14,6 +14,10 @@ module DailyprogrammerPair
       tweet.text
     end
 
+    def user
+      tweet.user
+    end
+
     def is_pair_request?
       text.include?("#pairme") && has_link_to_dailyprogrammer?
     end

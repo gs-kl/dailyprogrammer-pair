@@ -1,5 +1,4 @@
 module DailyprogrammerPair
-
   class Redis
     attr_reader :redis_object
 
@@ -21,6 +20,19 @@ module DailyprogrammerPair
       redis_object.select("0")
       !!!redis_object.get(tweet.id)
     end
-  end
 
+    def set_new_pair_request_for(tweet)
+      pair_requests.set(tweet.params.expanded_url, tweet.user.screen_name)
+    end
+
+    def matching_request_for(tweet)
+      puts "Checking for matching request..."
+      puts pair_requests.get(tweet.params.expanded_url)
+      pair_requests.get(tweet.params.expanded_url)
+    end
+
+    def delete_match_for(tweet)
+      pair_requests.del(tweet.params.expanded_url)
+    end
+  end
 end
