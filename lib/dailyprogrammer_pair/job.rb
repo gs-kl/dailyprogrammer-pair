@@ -11,13 +11,9 @@ module DailyprogrammerPair
 
     def call
       puts "Initialized job..."
-      latest_tweets.each do |tweet|
+      twitter_client.latest_tweets.each do |tweet|
         TweetHandler.new(redis_client, twitter_client).call(tweet) if redis_client.not_seen?(tweet)
       end
-    end
-
-    def latest_tweets
-      twitter_client.search("to:tw_gem_test", result_type: "recent").take(10)
     end
   end
 end

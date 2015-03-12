@@ -5,26 +5,9 @@ require 'net/http'
 
 require_relative 'resources/client'
 require_relative 'dailyprogrammer_pair/redis'
+require_relative 'dailyprogrammer_pair/job'
 
 
-class Twitter::Tweet
-  def is_pair_request?
-    self.text.include?("#pairme") && self.has_link_to_dailyprogrammer?
-  end
-
-  def params
-    TweetParams.new(self)
-  end
-
-  def has_link_to_dailyprogrammer?
-    if params.has_shortened_url?
-      url_regex = /https*:\/\/www.reddit.com\/r\/dailyprogrammer\//
-      params.expanded_url.match url_regex
-    else
-      false
-    end
-  end
-end
 
 
 class TweetParams
@@ -48,25 +31,6 @@ class TweetParams
   end
 end
 
-
-
-
-class Job
-  attr_reader :redis_client
-
-  def initialize redis_client
-    @redis_client = redis_client
-  end
-
-  def call
-    puts "Initialized job..."
-    CLIENT.search("to:tw_gem_test", result_type: "recent").take(10).each do |tweet|
-      TweetHandler.new(tweet) if redis_client.not_seen?(tweet)
-    end
-  end
-end
-
-
 class RequestHandler
   attr_reader :tweet
 
@@ -85,24 +49,12 @@ class RequestHandler
 end
 
 
-class TweetHandler
-  def initialize(tweet)
-    puts "Handling tweet #{tweet.id}..."
-    if tweet.is_pair_request?
-      RequestHandler.new(tweet)
-    else
-      CLIENT.update("@#{tweet.user.username} I only understand correctly formatted pair requests, and that wasn't one. Check your syntax or tweet at litchk.", in_reply_to_status_id: tweet.id)
-      puts "Tweet #{tweet} was not a valid pair request!\n#{tweet.text}"
-    end
-    Redis.new.recent_at_messages.set(tweet.id, true)
-  end
-end
-
 
 redis_configuration = {}
 redis_client = DailyprogrammerPair::Redis.new(Redis.new(redis_configuration))
+twitter_client = DailyprogrammerPair::TwitterClient.new(CLIENT)
 
 while true do
-  Job.new(redis_client).call
+  DailyprogrammerPair::Job.new(redis_client, twitter_client).call
   sleep 5
 end
