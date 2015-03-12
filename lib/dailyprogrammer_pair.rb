@@ -52,16 +52,16 @@ end
 
 
 class Job
-  attr_reader :redis
+  attr_reader :redis_client
 
-  def initialize redis_configuration
-    @redis = DailyprogrammerPair::Redis.new(Redis.new(redis_configuration))
+  def initialize redis_client
+    @redis_client = redis_client
   end
 
   def call
     puts "Initialized job..."
     CLIENT.search("to:tw_gem_test", result_type: "recent").take(10).each do |tweet|
-      TweetHandler.new(tweet) if redis.not_seen?(tweet)
+      TweetHandler.new(tweet) if redis_client.not_seen?(tweet)
     end
   end
 end
@@ -100,8 +100,9 @@ end
 
 
 redis_configuration = {}
+redis_client = DailyprogrammerPair::Redis.new(Redis.new(redis_configuration))
 
 while true do
-  Job.new(redis_configuration).call
+  Job.new(redis_client).call
   sleep 5
 end
