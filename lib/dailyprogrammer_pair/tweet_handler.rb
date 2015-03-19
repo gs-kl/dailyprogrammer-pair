@@ -9,12 +9,13 @@ module DailyprogrammerPair
 
     def call(tweet)
       puts "Handling tweet #{tweet.id}..."
-      if tweet.is_pair_request?
-        puts "Sending tweet to RequestHandler..."
-        RequestHandler.new(redis_client, twitter_client).call(tweet)
-      else
+      if tweet.is_pair_request? && tweet.has_link_to_dailyprogrammer?
+        puts "Sending tweet to PairRequestHander..."
+        PairRequestHander.new(redis_client, twitter_client).call(tweet)
+      elsif tweet.is_pair_request?
         puts "Tweet #{tweet} (\"#{tweet.text}\") was not a valid pair request; sending repsonse..."
-        twitter_client.update("@#{tweet.user.screen_name} I only understand (correctly formatted) pair requests. Check your syntax or tweet @litchk.", in_reply_to_status_id: tweet.id)
+        twitter_client.update("@#{tweet.user.screen_name} Looks like you wanted to make a pair request, but I didn't understand. Check your syntax.", in_reply_to_status_id: tweet.id)
+      # "else" -- if the tweet does not include the "#pairme" hashtag -- no action is taken.
       end
       redis_client.remember(tweet)
     end

@@ -15,17 +15,18 @@ module DailyprogrammerPair
     end
 
     def set_new_pair_request_for(tweet)
-      pair_requests.set(tweet.params.expanded_url, tweet.user.screen_name)
+      pair_requests.set(tweet.params.expanded_url + ":" + tweet.params.language, tweet.user.screen_name)
+      pair_requests.expire(tweet.params.expanded_url + ":" + tweet.params.language, 43200)
     end
 
     def matching_request_for(tweet)
       puts "Checking for matching request..."
-      puts pair_requests.get(tweet.params.expanded_url)
-      pair_requests.get(tweet.params.expanded_url)
+      puts pair_requests.get(tweet.params.expanded_url + ":" + tweet.params.language)
+      pair_requests.get(tweet.params.expanded_url + ":" + tweet.params.language)
     end
 
     def delete_match_for(tweet)
-      pair_requests.del(tweet.params.expanded_url)
+      pair_requests.del(tweet.params.expanded_url + ":" + tweet.params.language)
     end
 
     private

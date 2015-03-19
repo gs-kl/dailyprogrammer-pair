@@ -10,8 +10,7 @@ require_relative 'dailyprogrammer_pair/twitter_client'
 require_relative 'dailyprogrammer_pair/tweet_handler'
 require_relative 'dailyprogrammer_pair/tweet'
 require_relative 'dailyprogrammer_pair/tweet_params'
-require_relative 'dailyprogrammer_pair/request_handler'
-
+require_relative 'dailyprogrammer_pair/pair_request_handler'
 
 redis_configuration = {}
 redis_client = DailyprogrammerPair::Redis.new(Redis.new(redis_configuration))

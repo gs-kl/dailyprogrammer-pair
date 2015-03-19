@@ -7,7 +7,7 @@ module DailyprogrammerPair
     end
 
     def latest_tweets
-      client.search("to:tw_gem_test", result_type: "recent").take(10).map do |tweet|
+      client.search("to:tw_gem_test", result_type: "recent").take(30).map do |tweet|
         DailyprogrammerPair::Tweet.new(tweet)
       end
     end
